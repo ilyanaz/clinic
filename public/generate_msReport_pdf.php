@@ -2,7 +2,10 @@
 session_start();
 require_once __DIR__ . '/config/clinic_database.php';
 require_once __DIR__ . '/includes/clinic_functions.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+// Load Composer autoloader if available
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 require_once __DIR__ . '/get_header_document.php';
 
 // Set timezone to ensure current time is accurate
@@ -13,7 +16,7 @@ use Dompdf\Options;
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /login");
+    header("Location: " . url("login.php"));
     exit();
 }
 
@@ -120,7 +123,7 @@ if ($company_id || $company_name) {
 }
 
 if (!$company_data) {
-    header("Location: /ms_report.php?error=" . urlencode("Company not found"));
+    header("Location: " . url('ms_report.php') . "?error=" . urlencode("Company not found"));
     exit();
 }
 
@@ -797,5 +800,6 @@ $dompdf->stream($filename, [
     'Attachment' => 0  // 0 = inline display, 1 = download
 ]);
 ?>
+
 
 

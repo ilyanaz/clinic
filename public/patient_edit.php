@@ -5,13 +5,13 @@ require_once __DIR__ . '/includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
 // Check if patient ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header('Location: /patients.php?message=' . urlencode('Patient ID is required') . '&type=danger');
+    header('Location: ' . url('patients.php') . '?message=' . urlencode('Patient ID is required') . '&type=danger');
     exit();
 }
 
@@ -20,12 +20,12 @@ $patient = getClinicPatientById($patient_id);
 
 // Check if patient exists
 if (isset($patient['error'])) {
-    header('Location: /patients.php?message=' . urlencode($patient['error']) . '&type=danger');
+    header('Location: ' . url('patients.php') . '?message=' . urlencode($patient['error']) . '&type=danger');
     exit();
 }
 
 if (!$patient) {
-    header('Location: /patients.php?message=' . urlencode('Patient not found') . '&type=danger');
+    header('Location: ' . url('patients.php') . '?message=' . urlencode('Patient not found') . '&type=danger');
     exit();
 }
 
@@ -99,7 +99,7 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] == 'update_patient') {
         
         if ($result['success']) {
             // Redirect to patients.php with success message
-            header("Location: /patients.php?message=" . urlencode("Patient information updated successfully!") . "&type=success");
+            header("Location: " . url('patients.php') . "?message=" . urlencode("Patient information updated successfully!") . "&type=success");
             exit();
         } else {
             $message = $result['message'];

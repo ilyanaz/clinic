@@ -2,7 +2,10 @@
 session_start();
 require_once __DIR__ . '/config/clinic_database.php';
 require_once __DIR__ . '/includes/clinic_functions.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+// Load Composer autoloader if available
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 require_once __DIR__ . '/get_header_document.php';
 
 // Set timezone to ensure current time is accurate
@@ -13,7 +16,7 @@ use Dompdf\Options;
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /login");
+    header("Location: " . url("login.php"));
     exit();
 }
 
@@ -21,7 +24,7 @@ if (!isset($_SESSION['user_id'])) {
 $patient_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if (!$patient_id) {
-    header("Location: /patients.php");
+    header("Location: " . url("patients.php"));
     exit();
 }
 
@@ -29,12 +32,12 @@ if (!$patient_id) {
 $patient = getClinicPatientById($patient_id);
 
 if (isset($patient['error'])) {
-    header("Location: /patients.php?error=" . urlencode($patient['error']));
+    header("Location: " . url("patients.php?error=" . urlencode($patient['error'])));
     exit();
 }
 
 if (!$patient) {
-    header("Location: /patients.php?error=Patient not found");
+    header("Location: " . url("patients.php?error=" . urlencode("Patient not found")));
     exit();
 }
 

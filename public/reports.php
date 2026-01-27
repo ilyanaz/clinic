@@ -5,13 +5,13 @@ require_once 'includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
 // Check if user has permission to view reports
 if ($_SESSION['role'] != 'Admin' && $_SESSION['role'] != 'Doctor') {
-    header('Location: /');
+    header('Location: ' . url('index.php'));
     exit();
 }
 

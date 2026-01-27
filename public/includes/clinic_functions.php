@@ -3,6 +3,36 @@ require_once 'config/clinic_database.php';
 
 // Helper functions for clinic database operations
 
+/**
+ * Get the base URL path for the application
+ * Returns the correct path based on the current directory structure
+ */
+function getBasePath() {
+    // Get the current script directory
+    $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
+    // Remove trailing slash if not root
+    return rtrim($scriptPath, '/') ?: '';
+}
+
+/**
+ * Get full URL path for redirects and links
+ */
+function getBaseUrl() {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = getBasePath();
+    return $protocol . '://' . $host . $path;
+}
+
+/**
+ * Generate a relative URL path for internal links
+ */
+function url($path = '') {
+    $base = getBasePath();
+    $path = ltrim($path, '/');
+    return $base . '/' . $path;
+}
+
 function sanitizeInput($input) {
     if (is_null($input)) {
         return null;
@@ -1730,29 +1760,54 @@ function loginUser($username, $password) {
     global $clinic_pdo;
     
     try {
-        $stmt = $clinic_pdo->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-        $stmt->execute([$username, $password]);
+        // Trim whitespace from inputs
+        $username = trim($username);
+        $password = trim($password);
+        
+        // First, find the user by username (case-insensitive)
+        $stmt = $clinic_pdo->prepare("SELECT * FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)");
+        $stmt->execute([$username, $username]);
         $user = $stmt->fetch();
         
         if ($user) {
-            // Start session if not already started
-            if (session_status() == PHP_SESSION_NONE) {
-                session_start();
+            // Check password - support both plain text and hashed passwords
+            $stored_password = $user['password'];
+            $password_match = false;
+            
+            // Check if password is plain text (direct match)
+            if ($stored_password === $password) {
+                $password_match = true;
+            }
+            // Check if password is hashed (using password_verify)
+            elseif (password_verify($password, $stored_password)) {
+                $password_match = true;
+            }
+            // Also check with md5 (legacy support)
+            elseif (md5($password) === $stored_password) {
+                $password_match = true;
             }
             
-            // Set session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['first_name'] = $user['first_name'];
-            $_SESSION['last_name'] = $user['last_name'];
-            $_SESSION['email'] = $user['email'];
-            
-            return true;
+            if ($password_match) {
+                // Start session if not already started
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
+                
+                // Set session variables
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+                $_SESSION['first_name'] = $user['first_name'] ?? '';
+                $_SESSION['last_name'] = $user['last_name'] ?? '';
+                $_SESSION['email'] = $user['email'] ?? '';
+                
+                return true;
+            }
         }
         
         return false;
     } catch (Exception $e) {
+        error_log("Login error: " . $e->getMessage());
         return false;
     }
 }

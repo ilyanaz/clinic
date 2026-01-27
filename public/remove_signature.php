@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/clinic_database.php';
+require_once __DIR__ . '/config/clinic_database.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {

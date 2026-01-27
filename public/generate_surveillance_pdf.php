@@ -2,7 +2,10 @@
 session_start();
 require_once __DIR__ . '/config/clinic_database.php';
 require_once __DIR__ . '/includes/clinic_functions.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+// Load Composer autoloader if available
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
 require_once __DIR__ . '/get_header_document.php';
 
 // Set timezone to ensure current time is accurate
@@ -13,7 +16,7 @@ use Dompdf\Options;
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /login");
+    header("Location: " . url("login.php"));
     exit();
 }
 
@@ -21,7 +24,7 @@ if (!isset($_SESSION['user_id'])) {
 $surveillance_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if (!$surveillance_id) {
-    header("Location: /surveillance_list.php");
+    header("Location: " . url("surveillance_list.php"));
     exit();
 }
 
@@ -29,7 +32,7 @@ if (!$surveillance_id) {
 $data = getHealthSurveillanceById($surveillance_id);
 
 if (isset($data['error'])) {
-    header("Location: /surveillance_list.php?error=" . urlencode($data['error']));
+    header("Location: " . url('surveillance_list.php') . "?error=" . urlencode($data['error']));
     exit();
 }
 
@@ -1087,3 +1090,4 @@ $dompdf->stream($filename, [
     'Attachment' => 0  // 0 = inline display, 1 = download
 ]);
 ?>
+

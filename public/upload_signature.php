@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'config/clinic_database.php';
-require_once 'includes/clinic_functions.php';
+require_once __DIR__ . '/config/clinic_database.php';
+require_once __DIR__ . '/includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -36,7 +36,7 @@ if ($file['size'] > $maxSize) {
 }
 
 // Create uploads directory if it doesn't exist
-$uploadDir = 'uploads/signatures/';
+$uploadDir = __DIR__ . '/uploads/signatures/';
 if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
@@ -45,6 +45,7 @@ if (!is_dir($uploadDir)) {
 $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
 $filename = 'signature_' . $_SESSION['user_id'] . '_' . time() . '.' . $fileExtension;
 $filepath = $uploadDir . $filename;
+$relativePath = 'uploads/signatures/' . $filename;
 
 // Move uploaded file
 if (move_uploaded_file($file['tmp_name'], $filepath)) {
@@ -68,7 +69,7 @@ if (move_uploaded_file($file['tmp_name'], $filepath)) {
             $_SESSION['user_id'],
             $filename,
             $file['name'],
-            $filepath,
+            $relativePath,
             $signature_name
         ]);
         

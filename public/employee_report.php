@@ -1,17 +1,17 @@
 <?php
 session_start();
-require_once 'config/clinic_database.php';
-require_once 'includes/clinic_functions.php';
+require_once __DIR__ . '/config/clinic_database.php';
+require_once __DIR__ . '/includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
 // Check if user has permission
 if ($_SESSION['role'] != 'Admin' && $_SESSION['role'] != 'Doctor') {
-    header('Location: /');
+    header('Location: ' . url('index.php'));
     exit();
 }
 
@@ -485,7 +485,7 @@ $all_patients = getAllClinicPatients();
     </style>
 </head>
 <body>
-    <?php include 'includes/navigation.php'; ?>
+    <?php include __DIR__ . '/includes/navigation.php'; ?>
 
     <div class="container-fluid mt-4">
         <!-- Employee Selection Form (Hidden when patient is selected) -->
@@ -511,7 +511,7 @@ $all_patients = getAllClinicPatients();
                     <div class="col-md-6">
                         <label class="form-label">&nbsp;</label>
                         <div>
-                            <a href="/generate_employee_pdf.php?patient_id=<?php echo $patient_id; ?>" class="btn btn-primary" target="_blank">
+                            <a href="generate_employee_pdf.php?patient_id=<?php echo $patient_id; ?>" class="btn btn-primary" target="_blank">
                                 <i class="fas fa-file-pdf"></i> Download PDF
                             </a>
                         </div>
@@ -672,7 +672,7 @@ $all_patients = getAllClinicPatients();
                 <h5 class="mb-0"><i class="fas fa-certificate"></i> Certificate of Fitness</h5>
                 <div>
                     <span class="badge bg-primary me-2">USECHH 3</span>
-                    <a href="/generate_certificate_pdf.php?patient_id=<?php echo $patient_id; ?>" class="btn btn-success btn-sm" target="_blank">
+                    <a href="generate_certificate_pdf.php?patient_id=<?php echo $patient_id; ?>" class="btn btn-success btn-sm" target="_blank">
                         <i class="fas fa-file-pdf"></i> Generate PDF
                     </a>
                 </div>

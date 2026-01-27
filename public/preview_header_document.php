@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/clinic_database.php';
+require_once __DIR__ . '/config/clinic_database.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -24,22 +24,12 @@ try {
     $document = $stmt->fetch();
     
     if ($document && file_exists($document['file_path'])) {
-        // Determine content type based on file extension
-        $fileExtension = strtolower(pathinfo($document['file_path'], PATHINFO_EXTENSION));
-        $contentType = 'application/pdf';
-        
-        if (in_array($fileExtension, ['jpg', 'jpeg'])) {
-            $contentType = 'image/jpeg';
-        } elseif ($fileExtension === 'png') {
-            $contentType = 'image/png';
-        }
-        
-        // Set headers for file display
-        header('Content-Type: ' . $contentType);
+        // Set headers for PDF display
+        header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="' . $document['original_name'] . '"');
         header('Content-Length: ' . filesize($document['file_path']));
         
-        // Output the file
+        // Output the PDF file
         readfile($document['file_path']);
     } else {
         echo 'No header document found';

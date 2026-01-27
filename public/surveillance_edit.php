@@ -1,11 +1,11 @@
 <?php
 session_start();
-require_once 'config/clinic_database.php';
-require_once 'includes/clinic_functions.php';
+require_once __DIR__ . '/config/clinic_database.php';
+require_once __DIR__ . '/includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
@@ -24,7 +24,7 @@ if (isset($_GET['id'])) {
         $messageType = 'danger';
     }
 } else {
-    header('Location: /surveillance_list.php');
+    header('Location: ' . url('surveillance_list.php'));
     exit();
 }
 
@@ -586,14 +586,14 @@ if ($_POST) {
     </style>
 </head>
 <body>
-    <?php include 'includes/navigation.php'; ?>
+    <?php include __DIR__ . '/includes/navigation.php'; ?>
 
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-end align-items-center mb-4">
                     <div>
-                        <a href="/surveillance_list.php" class="btn btn-outline-primary">
+                        <a href="surveillance_list.php" class="btn btn-outline-primary">
                             <i class="fas fa-list"></i> View Surveillance Records
                         </a>
                     </div>

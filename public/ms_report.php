@@ -3,12 +3,13 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
 // Include database connection
 require_once 'config/clinic_database.php';
+require_once __DIR__ . '/includes/clinic_functions.php';
 
 // Get company_id and chemical from URL parameters
 $company_id = isset($_GET['company_id']) ? (int)$_GET['company_id'] : null;

@@ -6,7 +6,7 @@ require_once 'includes/company_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /login");
+    header("Location: " . url("login.php"));
     exit();
 }
 
@@ -32,7 +32,7 @@ if ($_POST) {
                     
                     if ($companyId) {
                         $_SESSION['success_message'] = "Company added successfully!";
-                        header("Location: /company.php");
+                        header("Location: " . url("company.php"));
                         exit();
                     } else {
                         $_SESSION['error_message'] = "Failed to add company. Company name or MyKPP number may already exist.";
@@ -61,7 +61,7 @@ if ($_POST) {
                     
                     if ($result) {
                         $_SESSION['success_message'] = "Company updated successfully!";
-                        header("Location: /company.php");
+                        header("Location: " . url("company.php"));
                         exit();
                     } else {
                         $_SESSION['error_message'] = "Failed to update company.";

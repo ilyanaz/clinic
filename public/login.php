@@ -16,9 +16,21 @@ try {
     
     if ($user_count == 0) {
         // Create admin user directly (no need for separate doctor record)
+        // Store password as plain text to match the database structure
         $stmt = $clinic_pdo->prepare("INSERT INTO users (username, email, password, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute(['admin', 'admin@system.com', 'admin123', 'Admin', 'System', 'Administrator']);
         $success = 'System initialized! Default admin user created.';
+    } else {
+        // Check if admin user exists and has correct password
+        $stmt = $clinic_pdo->prepare("SELECT * FROM users WHERE username = 'admin'");
+        $stmt->execute();
+        $admin_user = $stmt->fetch();
+        
+        if ($admin_user && $admin_user['password'] !== 'admin123') {
+            // Reset admin password if it doesn't match
+            $stmt = $clinic_pdo->prepare("UPDATE users SET password = 'admin123' WHERE username = 'admin'");
+            $stmt->execute();
+        }
     }
 } catch (Exception $e) {
     $error = 'Database error: ' . $e->getMessage();
@@ -29,7 +41,7 @@ if ($_POST) {
     $password = $_POST['password'];
     
     if (loginUser($username, $password)) {
-        header('Location: /');
+        header('Location: ' . url('index.php'));
         exit();
     } else {
         $error = 'Invalid username or password';

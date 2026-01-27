@@ -5,7 +5,7 @@ require_once 'includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 

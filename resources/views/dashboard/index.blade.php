@@ -6,10 +6,23 @@
     <title>Medical Surveillance System - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body>
+    @php
+    // Get navigation data
+    $user_role = session('role') ?? 'Guest';
+    $user_name = session('username') ?? 'Guest';
+    $user_first_name = session('first_name') ?? $user_name;
+    $current_page = 'index';
+    @endphp
     @include('includes.navigation')
+    
+    @php
+    // Convert stats array to variables for PHP usage
+    $stats = $stats ?? [];
+    $recentAppointments = $recentAppointments ?? [];
+    @endphp
 
     <!-- Main Content -->
     <div class="container-fluid mt-4">
@@ -20,18 +33,18 @@
                     <div class="card-body">
                         <h6 class="card-title">Quick Actions</h6>
                         <div class="d-grid gap-2">
-                            <a href="{{ url('patients.php?action=add') }}" class="btn btn-outline-primary btn-sm">
+                            <a href="patient_form.php" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-user-plus"></i> Add Patient
                             </a>
                             @if($userRole == 'Admin')
-                            <a href="{{ url('doctors.php') }}" class="btn btn-outline-secondary btn-sm">
+                            <a href="doctors.php" class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-user-md"></i> Manage Doctors
                             </a>
                             @endif
-                            <a href="{{ url('appointments.php?action=add') }}" class="btn btn-outline-success btn-sm">
+                            <a href="appointments.php?action=add" class="btn btn-outline-success btn-sm">
                                 <i class="fas fa-calendar-plus"></i> New Appointment
                             </a>
-                            <a href="{{ url('surveillance.php?action=add') }}" class="btn btn-outline-info btn-sm">
+                            <a href="usechh_1.php?new_surveillance=1" class="btn btn-outline-info btn-sm">
                                 <i class="fas fa-clipboard-list"></i> New Surveillance
                             </a>
                         </div>
@@ -43,20 +56,20 @@
                     <div class="card-body">
                         <h6 class="card-title">Today's Overview</h6>
                         <div class="row text-center">
-                            <div class="col-4">
+                                    <div class="col-4">
                                 <div class="border-end">
-                                    <h4 class="text-primary">{{ $stats['total_patients'] }}</h4>
+                                    <h4 class="text-primary"><?php echo $stats['total_patients'] ?? 0; ?></h4>
                                     <small class="text-muted">Patients</small>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="border-end">
-                                    <h4 class="text-info">{{ $stats['total_staff'] }}</h4>
+                                    <h4 class="text-info"><?php echo $stats['total_staff'] ?? 0; ?></h4>
                                     <small class="text-muted">Doctors</small>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <h4 class="text-success">{{ $stats['appointments_today'] }}</h4>
+                                <h4 class="text-success"><?php echo $stats['appointments_today'] ?? 0; ?></h4>
                                 <small class="text-muted">Appointments</small>
                             </div>
                         </div>
@@ -71,8 +84,8 @@
                     <div class="col-12">
                         <div class="card welcome-card">
                             <div class="card-body text-center py-5">
-                                <h2 class="card-title text-primary mb-3">Medical Surveillance System</h2>
-                                <p class="card-text text-muted fs-6">Professional medical surveillance and patient management for occupational health monitoring.</p>
+                                <h2 class="card-title text-primary mb-3">Welcome, {{ $userName ?? 'User' }}!</h2>
+                                <p class="card-text text-muted fs-6">Medical Surveillance System - Professional medical surveillance and patient management for occupational health monitoring.</p>
                             </div>
                         </div>
                     </div>
@@ -86,7 +99,7 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Patients</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total_patients'] }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $stats['total_patients'] ?? 0; ?></div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-users fa-2x text-gray-300"></i>
@@ -102,7 +115,7 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Today's Appointments</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['appointments_today'] }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $stats['appointments_today'] ?? 0; ?></div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -118,7 +131,7 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Surveillance Records</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['surveillance_records'] }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $stats['surveillance_records'] ?? 0; ?></div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
@@ -134,7 +147,7 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Reviews</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['pending_reviews'] }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $stats['pending_reviews'] ?? 0; ?></div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-clock fa-2x text-gray-300"></i>
@@ -164,24 +177,34 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @if(count($recentAppointments) > 0)
-                                                @foreach($recentAppointments as $appointment)
-                                                <tr>
-                                                    <td>{{ htmlspecialchars($appointment->patient_name ?? 'N/A') }}</td>
-                                                    <td>{{ $appointment->appointment_date ? date('M d, Y', strtotime($appointment->appointment_date)) : 'N/A' }}</td>
-                                                    <td>{{ htmlspecialchars($appointment->appointment_type ?? 'N/A') }}</td>
-                                                    <td>
-                                                        <span class="badge bg-{{ ($appointment->status ?? '') == 'Scheduled' ? 'primary' : (($appointment->status ?? '') == 'Completed' ? 'success' : 'danger') }}">
-                                                            {{ $appointment->status ?? 'N/A' }}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            @else
+                                            <?php
+                                            $recent_appointments = $recentAppointments ?? [];
+                                            if (!empty($recent_appointments)):
+                                                foreach ($recent_appointments as $appointment):
+                                                    $appointment = (array)$appointment;
+                                            ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($appointment['patient_name'] ?? 'N/A'); ?></td>
+                                                <td><?php echo isset($appointment['appointment_date']) && $appointment['appointment_date'] ? date('M d, Y', strtotime($appointment['appointment_date'])) : 'N/A'; ?></td>
+                                                <td><?php echo htmlspecialchars($appointment['appointment_type'] ?? 'N/A'); ?></td>
+                                                <td>
+                                                    <?php
+                                                    $status = $appointment['status'] ?? 'Scheduled';
+                                                    $badgeClass = $status == 'Scheduled' ? 'primary' : ($status == 'Completed' ? 'success' : 'danger');
+                                                    ?>
+                                                    <span class="badge bg-<?php echo $badgeClass; ?>">
+                                                        <?php echo $status; ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <?php 
+                                                endforeach;
+                                            else:
+                                            ?>
                                             <tr>
                                                 <td colspan="4" class="text-center text-muted">No recent appointments</td>
                                             </tr>
-                                            @endif
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -198,22 +221,27 @@
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between">
                                         <span>Completed This Month</span>
-                                        <span class="font-weight-bold">{{ $stats['completed_this_month'] }}</span>
+                                        <span class="font-weight-bold"><?php echo $stats['completed_this_month'] ?? 0; ?></span>
                                     </div>
                                     <div class="progress mt-1" style="height: 8px;">
-                                        <div class="progress-bar bg-success" style="width: {{ min(100, ($stats['completed_this_month'] / max(1, $stats['total_appointments'])) * 100) }}%"></div>
+                                        <?php
+                                        $totalAppts = max(1, $stats['total_appointments'] ?? 1);
+                                        $completed = $stats['completed_this_month'] ?? 0;
+                                        $percentage = min(100, ($completed / $totalAppts) * 100);
+                                        ?>
+                                        <div class="progress-bar bg-success" style="width: <?php echo $percentage; ?>%"></div>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between">
                                         <span>Abnormal Findings</span>
-                                        <span class="font-weight-bold text-warning">{{ $stats['abnormal_findings'] }}</span>
+                                        <span class="font-weight-bold text-warning"><?php echo $stats['abnormal_findings'] ?? 0; ?></span>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between">
                                         <span>Fit for Work</span>
-                                        <span class="font-weight-bold text-success">{{ $stats['fit_for_work'] }}</span>
+                                        <span class="font-weight-bold text-success"><?php echo $stats['fit_for_work'] ?? 0; ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -225,39 +253,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('assets/js/main.js') }}"></script>
-    <script>
-        // Simple dropdown functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropdownToggle = document.querySelector('.dropdown-toggle');
-            const dropdownMenu = document.querySelector('.dropdown-menu');
-            
-            if (dropdownToggle && dropdownMenu) {
-                console.log('Dropdown elements found');
-                
-                dropdownToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Dropdown clicked');
-                    
-                    // Simple toggle
-                    if (dropdownMenu.style.display === 'block') {
-                        dropdownMenu.style.display = 'none';
-                    } else {
-                        dropdownMenu.style.display = 'block';
-                    }
-                });
-                
-                // Close when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                        dropdownMenu.style.display = 'none';
-                    }
-                });
-            } else {
-                console.log('Dropdown elements not found');
-            }
-        });
-    </script>
+    <script src="assets/js/main.js"></script>
 </body>
 </html>

@@ -1,10 +1,11 @@
 <?php
 session_start();
 require_once __DIR__ . '/config/clinic_database.php';
+require_once __DIR__ . '/includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
@@ -142,7 +143,7 @@ if ($company_id <= 0) {
     // If still no company_id, redirect to company selection
     if ($company_id <= 0) {
         $_SESSION['error_message'] = 'Please select a company to view surveillance records.';
-        header('Location: /company.php');
+        header('Location: ' . url('company.php'));
         exit();
     }
 }
@@ -155,12 +156,12 @@ try {
     
     if (!$company) {
         $_SESSION['error_message'] = 'Company not found.';
-        header('Location: /company.php');
+        header('Location: ' . url('company.php'));
         exit();
     }
 } catch (PDOException $e) {
     $_SESSION['error_message'] = 'Database error: ' . $e->getMessage();
-        header('Location: /company.php');
+    header('Location: company.php');
     exit();
 }
 
@@ -189,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             $_SESSION['success_message'] = 'Surveillance record deleted successfully.';
             
             // Redirect to refresh the page
-            header('Location: /surveillance_list.php?' . http_build_query($_GET));
+            header('Location: ' . url('surveillance_list.php?' . http_build_query($_GET)));
             exit();
             
         } catch (Exception $e) {

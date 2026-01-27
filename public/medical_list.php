@@ -4,7 +4,7 @@ require_once __DIR__ . '/config/clinic_database.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
@@ -13,7 +13,7 @@ $company_id = isset($_GET['company_id']) ? (int)$_GET['company_id'] : 0;
 
 if ($company_id <= 0) {
     $_SESSION['error_message'] = 'Invalid company ID.';
-    header('Location: /company.php');
+    header('Location: ' . url('company.php'));
     exit();
 }
 
@@ -24,12 +24,12 @@ try {
     $company = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$company) {
         $_SESSION['error_message'] = 'Company not found.';
-        header('Location: /company.php');
+        header('Location: ' . url('company.php'));
         exit();
     }
 } catch (PDOException $e) {
     $_SESSION['error_message'] = 'Database error: ' . $e->getMessage();
-    header('Location: /company.php');
+    header('Location: ' . url('company.php'));
     exit();
 }
 

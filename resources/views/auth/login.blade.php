@@ -151,27 +151,6 @@
             color: #721c24;
         }
         
-        .credentials-info {
-            background-color: #e8f5e8;
-            border: 1px solid #c8e6c9;
-            border-radius: 4px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .credentials-info h6 {
-            color: #389B5B;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .credentials-info p {
-            color: #389B5B;
-            margin: 0.25rem 0;
-            font-size: 0.9rem;
-        }
-        
         .footer-text {
             text-align: center;
             color: #6c757d;
@@ -212,7 +191,7 @@
         <div class="login-card">
             <div class="login-header">
                 <div class="logo">
-                    <img src="{{ asset('medical_surveillance_logo.png') }}" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <img src="/clinic/public/medical_surveillance_logo.png" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <i class="fas fa-hospital" style="display: none; font-size: 2rem; color: white;"></i>
                 </div>
                 <h2>Medical Surveillance</h2>
@@ -220,58 +199,42 @@
             </div>
             
             <div class="login-body">
-                @if(session()->has('user_id'))
-                    <div class="alert alert-info" role="alert">
-                        <i class="fas fa-info-circle"></i> You are already logged in as <strong>{{ session('username') }}</strong>
+                @if(session('success'))
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle"></i> {{ session('success') }}
                     </div>
-                    <div class="text-center mb-3">
-                        <a href="{{ route('dashboard') }}" class="btn btn-primary">
-                            <i class="fas fa-tachometer-alt"></i> Go to Dashboard
-                        </a>
-                    </div>
-                    <div class="text-center">
-                        <a href="{{ route('logout') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </div>
-                @else
-                    @if(session('success'))
-                        <div class="alert alert-success" role="alert">
-                            <i class="fas fa-check-circle"></i> {{ session('success') }}
-                        </div>
-                    @endif
-                    
-                    @if(session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
-                        </div>
-                    @endif
-                
-                    
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-                        <div class="form-group">
-                            <label for="username" class="form-label">
-                                <i class="fas fa-user"></i> Username or Email
-                            </label>
-                            <input type="text" class="form-control" id="username" name="username" 
-                                   value="{{ old('username', 'admin') }}" 
-                                   required autocomplete="username">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="password" class="form-label">
-                                <i class="fas fa-lock"></i> Password
-                            </label>
-                            <input type="password" class="form-control" id="password" name="password" 
-                                   required autocomplete="current-password" placeholder="Enter your password">
-                        </div>
-                        
-                        <button type="submit" class="btn btn-login">
-                            <i class="fas fa-sign-in-alt"></i> Login to System
-                        </button>
-                    </form>
                 @endif
+                
+                @if(session('error') || $errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        {{ session('error') ?? $errors->first() }}
+                    </div>
+                @endif
+                
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i> Username or Email
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" 
+                               value="{{ old('username', 'admin') }}" 
+                               required autocomplete="username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" 
+                               required autocomplete="current-password" placeholder="Enter your password">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Login to System
+                    </button>
+                </form>
                 
                 <div class="footer-text">
                     <i class="fas fa-shield-alt"></i> Secure Medical Surveillance System

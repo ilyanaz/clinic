@@ -1,10 +1,11 @@
 <?php
 session_start();
-require_once 'config/clinic_database.php';
+require_once __DIR__ . '/config/clinic_database.php';
+require_once __DIR__ . '/includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
@@ -811,7 +812,7 @@ if (isset($_GET['error'])) {
     </style>
 </head>
 <body>
-    <?php include 'includes/navigation.php'; ?>
+    <?php include __DIR__ . '/includes/navigation.php'; ?>
 
     <!-- Main Content -->
     <div class="container-fluid mt-4">

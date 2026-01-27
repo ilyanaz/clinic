@@ -18,8 +18,19 @@ class DashboardController extends Controller
         $today = date('Y-m-d');
         $stats = $this->getDashboardStats($today);
         $recentAppointments = $this->getRecentAppointments(5);
+        
+        // Convert collection to array for compatibility
+        $recentAppointmentsArray = [];
+        foreach ($recentAppointments as $apt) {
+            $recentAppointmentsArray[] = (array)$apt;
+        }
 
-        return view('dashboard.index', compact('userRole', 'userName', 'stats', 'recentAppointments'));
+        return view('dashboard.index', [
+            'userRole' => $userRole,
+            'userName' => $userName,
+            'stats' => $stats,
+            'recentAppointments' => $recentAppointmentsArray
+        ]);
     }
 
     /**

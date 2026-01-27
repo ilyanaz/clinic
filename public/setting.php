@@ -5,7 +5,7 @@ require_once 'includes/clinic_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /login');
+    header('Location: ' . url('login.php'));
     exit();
 }
 
@@ -90,7 +90,7 @@ if ($_POST && isset($_POST['update_settings'])) {
     </style>
 </head>
 <body>
-    <?php include 'includes/navigation.php'; ?>
+    <?php include __DIR__ . '/includes/navigation.php'; ?>
 
     <div class="container-fluid mt-4">
         <!-- Page Header -->
@@ -500,7 +500,7 @@ if ($_POST && isset($_POST['update_settings'])) {
                         html += `<div class="col-md-3 mb-3">
                             <div class="card">
                                 <div class="card-body text-center">
-                                    <img src="/${signature.file_path}" class="img-fluid mb-2" style="max-height: 100px; border: 1px solid #ddd; padding: 5px;" alt="Signature">
+                                    <img src="${signature.file_path}" class="img-fluid mb-2" style="max-height: 100px; border: 1px solid #ddd; padding: 5px;" alt="Signature">
                                     <p class="small text-muted">${formattedDate}</p>
                                     <button class="btn btn-sm btn-outline-danger" onclick="removeSignature(${signature.id})">
                                         <i class="fas fa-trash"></i> Delete
