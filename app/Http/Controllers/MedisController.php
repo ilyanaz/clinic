@@ -30,6 +30,7 @@ class MedisController extends Controller
             resource_path('medis/company/' . basename($path)), // company/
             resource_path('medis/patient/' . basename($path)), // patient/
             resource_path('medis/medical/' . basename($path)), // medical/
+            resource_path('medis/audio/' . basename($path)), // audio/
             resource_path('medis/generate/' . basename($path)), // generate/
             resource_path('medis/report/' . basename($path)), // report/
             resource_path('medis/setting/' . basename($path)), // setting/
