@@ -45,19 +45,6 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                     </ul>
                 </li>
                 
-                <!-- Audiometry Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="audiometryDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-headphones"></i> Audiometry
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="company.php?type=audiometry"><i class="fas fa-building"></i> List of Companies</a></li>
-                        <li><a class="dropdown-item" href="patients.php?type=audiometry"><i class="fas fa-users"></i> List of Patients</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="audio.php"><i class="fas fa-headphones"></i> Examination</a></li>
-                    </ul>
-                </li>
-                
                 <!-- Reports Dropdown -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle <?php echo in_array($current_page, ['reports', 'medical_report', 'employee_report', 'ms_report', 'abnormal_workers_report']) ? 'active' : ''; ?>" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">

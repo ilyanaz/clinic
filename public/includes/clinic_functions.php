@@ -9,9 +9,22 @@ require_once 'config/clinic_database.php';
  */
 function getBasePath() {
     // Get the current script directory
-    $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
-    // Remove trailing slash if not root
-    return rtrim($scriptPath, '/') ?: '';
+    // When served via Laravel routes, use REQUEST_URI instead
+    if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '.php') !== false) {
+        $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $scriptPath = dirname($requestPath);
+        // Remove trailing slash if not root
+        return rtrim($scriptPath, '/') ?: '';
+    }
+    
+    // Fallback to SCRIPT_NAME
+    if (isset($_SERVER['SCRIPT_NAME'])) {
+        $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
+        return rtrim($scriptPath, '/') ?: '';
+    }
+    
+    // Default: assume we're in /clinic/public/ or root
+    return '';
 }
 
 /**
@@ -26,11 +39,25 @@ function getBaseUrl() {
 
 /**
  * Generate a relative URL path for internal links
+ * Uses clinic_url() to avoid conflict with Laravel's url() helper
  */
-function url($path = '') {
-    $base = getBasePath();
-    $path = ltrim($path, '/');
-    return $base . '/' . $path;
+if (!function_exists('clinic_url')) {
+    function clinic_url($path = '') {
+        $base = getBasePath();
+        $path = ltrim($path, '/');
+        return $base . '/' . $path;
+    }
+}
+
+/**
+ * Wrapper for URL generation - works with or without Laravel
+ * All files should use app_url() instead of url() to avoid conflicts
+ */
+if (!function_exists('app_url')) {
+    function app_url($path = '') {
+        // Use our custom function that works with the base path
+        return clinic_url($path);
+    }
 }
 
 function sanitizeInput($input) {

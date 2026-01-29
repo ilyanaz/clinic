@@ -14,8 +14,8 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     require __DIR__.'/../vendor/autoload.php';
 } else {
-    // If Composer dependencies are not installed, redirect to PHP login page
-    header('Location: /clinic/public/login.php');
+    // If Composer dependencies are not installed, redirect to login page
+    header('Location: /login.php');
     exit();
 }
 
@@ -26,8 +26,8 @@ try {
     
     $app->handleRequest(Request::capture());
 } catch (Exception $e) {
-    // If Laravel fails to bootstrap, redirect to PHP login page
+    // If Laravel fails to bootstrap, redirect to login page
     error_log('Laravel bootstrap error: ' . $e->getMessage());
-    header('Location: /clinic/public/login.php');
+    header('Location: /login.php');
     exit();
 }
