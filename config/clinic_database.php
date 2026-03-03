@@ -8,12 +8,72 @@
  * Update CLINIC_DB_PASS if you've set a different password
  */
 
+/**
+ * Read environment variables safely in both Laravel and plain PHP contexts.
+ */
+function clinic_env(string $key, $default = null) {
+    if (function_exists('env')) {
+        $value = env($key);
+        if ($value !== null && $value !== '') {
+            return $value;
+        }
+    }
+
+    $value = getenv($key);
+    if ($value !== false && $value !== '') {
+        return $value;
+    }
+
+    return $default;
+}
+
+/**
+ * Import SQL dump if the schema has not been initialized yet.
+ */
+function importClinicSqlDump(PDO $pdo, string $dumpPath): void {
+    if (!is_file($dumpPath) || !is_readable($dumpPath)) {
+        return;
+    }
+
+    $sql = file_get_contents($dumpPath);
+    if ($sql === false || trim($sql) === '') {
+        return;
+    }
+
+    // Remove UTF-8 BOM if present.
+    $sql = preg_replace('/^\xEF\xBB\xBF/', '', $sql);
+
+    // Split statements on semicolon followed by line break.
+    $statements = preg_split('/;\s*[\r\n]+/', $sql);
+    if (!is_array($statements)) {
+        return;
+    }
+
+    $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
+
+    foreach ($statements as $statement) {
+        $statement = trim($statement);
+        if ($statement === '') {
+            continue;
+        }
+
+        // Skip SQL comments that are split as standalone chunks.
+        if (preg_match('/^(--|\/\*|\*|#)/', $statement) === 1) {
+            continue;
+        }
+
+        $pdo->exec($statement);
+    }
+
+    $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
+}
+
 // Database connection settings
 // Connected to the medical database (medical.sql)
-define('CLINIC_DB_HOST', 'localhost');
-define('CLINIC_DB_NAME', 'medical');  // Database name (matches medical.sql)
-define('CLINIC_DB_USER', 'root');
-define('CLINIC_DB_PASS', '');  // XAMPP default: empty password
+define('CLINIC_DB_HOST', clinic_env('CLINIC_DB_HOST', clinic_env('DB_HOST', 'localhost')));
+define('CLINIC_DB_NAME', clinic_env('CLINIC_DB_NAME', clinic_env('DB_DATABASE', 'medical'))); // Database name (matches medical.sql)
+define('CLINIC_DB_USER', clinic_env('CLINIC_DB_USER', clinic_env('DB_USERNAME', 'root')));
+define('CLINIC_DB_PASS', clinic_env('CLINIC_DB_PASS', clinic_env('DB_PASSWORD', ''))); // XAMPP default: empty password
 
 require_once __DIR__ . '/clinic_schema_updates.php';
 
@@ -30,6 +90,17 @@ try {
     $clinic_pdo = new PDO("mysql:host=" . CLINIC_DB_HOST . ";dbname=" . CLINIC_DB_NAME . ";charset=utf8mb4", CLINIC_DB_USER, CLINIC_DB_PASS);
     $clinic_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $clinic_pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    // Auto-import the SQL dump on fresh setups when the core table is missing.
+    $usersTableExists = false;
+    $tableCheckStmt = $clinic_pdo->query("SHOW TABLES LIKE 'users'");
+    if ($tableCheckStmt !== false) {
+        $usersTableExists = (bool) $tableCheckStmt->fetchColumn();
+    }
+
+    if (!$usersTableExists) {
+        importClinicSqlDump($clinic_pdo, base_path('database/medical.sql'));
+    }
 
     // Set in global scope - $GLOBALS is the global namespace
     $GLOBALS['clinic_pdo'] = $clinic_pdo;
