@@ -21,8 +21,40 @@ $legacyFiles = [
     'setting', 'profile',
     'upload_signature', 'upload_header_document', 'get_signature_history',
     'get_header_history', 'get_header_document', 'preview_header_document',
-    'remove_signature', 'remove_specific_header', 'get_logo'
+    'remove_signature', 'remove_specific_header'
 ];
+
+$serveLogo = function () {
+    $logoCandidates = [
+        storage_path('app/uploads/logo/medical_surveillance_logo.png'),
+        public_path('medical_surveillance_logo.png'),
+    ];
+
+    foreach ($logoCandidates as $logoPath) {
+        if (!is_file($logoPath) || !is_readable($logoPath)) {
+            continue;
+        }
+
+        $binary = @file_get_contents($logoPath);
+        if ($binary === false) {
+            continue;
+        }
+
+        $mime = @mime_content_type($logoPath) ?: 'image/png';
+
+        return response($binary, 200, [
+            'Content-Type' => $mime,
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
+    }
+
+    abort(404, 'Logo not found');
+};
+
+Route::get('/get_logo', $serveLogo);
+Route::get('/get_logo.php', $serveLogo);
 
 foreach ($legacyFiles as $file) {
     // Route with .php extension (for backward compatibility)

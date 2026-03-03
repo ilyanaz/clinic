@@ -21,8 +21,8 @@ $current_page = preg_replace('/\.php$/', '', $current_page);
     <div class="container-fluid">
         <a class="navbar-brand" href="<?php echo app_url('index.php'); ?>">
             <div class="logo-small">
-                <img src="<?php echo app_url('get_logo.php'); ?>" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <i class="fas fa-hospital" style="display: none; font-size: 1.2rem; color: white;"></i>
+                <img src="<?php echo app_url('get_logo'); ?>?v=2" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <i class="fas fa-hospital" style="display: none; font-size: 1.2rem; color: #389B5B;"></i>
             </div>
             <div class="brand-text">
                 <div class="brand-title">Medical Surveillance System</div>

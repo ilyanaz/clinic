@@ -50,18 +50,23 @@ if (isset($_SESSION) && is_array($_SESSION)) {
         }
         
         .logo {
-            width: 300px;
-            height: 300px;
+            width: 100px;
+            height: 100px;
             background: transparent;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem;
-            font-size: 2rem;
-            color: white;
             border: none;
             box-shadow: none;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 78%;
         }
         
         .logout-header h2 {
@@ -119,7 +124,8 @@ if (isset($_SESSION) && is_array($_SESSION)) {
         <div class="logout-card">
             <div class="logout-header">
                 <div class="logo">
-                    <i class="fas fa-hospital"></i>
+                    <img src="<?php echo app_url('get_logo'); ?>?v=2" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <i class="fas fa-hospital" style="display: none; font-size: 2rem; color: white;"></i>
                 </div>
                 <h2>Medical Surveillance</h2>
                 <p>System Logout</p>

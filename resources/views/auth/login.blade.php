@@ -61,7 +61,8 @@
         .logo img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
+            object-position: center 78%;
         }
         
         .login-header h2 {
@@ -191,7 +192,7 @@
         <div class="login-card">
             <div class="login-header">
                 <div class="logo">
-                    <img src="{{ url('get_logo') }}" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <img src="{{ rtrim(request()->getBaseUrl(), '/') . '/get_logo?v=3' }}" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <i class="fas fa-hospital" style="display: none; font-size: 2rem; color: white;"></i>
                 </div>
                 <h2>Medical Surveillance</h2>
