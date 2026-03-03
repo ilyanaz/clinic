@@ -7,7 +7,7 @@ use App\Http\Controllers\MedisController;
 
 // Legacy PHP file routes - handle both GET and POST
 $legacyFiles = [
-    'login', 'logout', 'index', 'patients', 'patient_list', 'patient_form', 
+    'index', 'patients', 'patient_list', 'patient_form', 
     'patient_view', 'patient_edit', 'company', 'company_form', 'medical', 
     'medical_list', 'medical_report', 'ms_report', 'employee_report', 
     'abnormal_workers_report', 'reports', 'usechh_1', 'usechh1_view',
@@ -37,6 +37,17 @@ foreach ($legacyFiles as $file) {
         return $controller->serve($file . '.php');
     });
 }
+
+// Keep direct .php login/logout URLs for legacy bookmarks.
+Route::match(['get', 'post'], '/login.php', function () {
+    $controller = new MedisController();
+    return $controller->serve('login.php');
+});
+
+Route::match(['get', 'post'], '/logout.php', function () {
+    $controller = new MedisController();
+    return $controller->serve('logout.php');
+});
 
 // Original Laravel routes (keep for compatibility)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

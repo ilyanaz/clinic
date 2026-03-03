@@ -1,10 +1,13 @@
 <?php
-session_start();
 require_once __DIR__ . '/../../app/Services/clinic_functions.php';
 
-// Clear all session data
-session_unset();
-session_destroy();
+// Clear Laravel session (canonical auth state).
+session()->flush();
+
+// Also clear legacy array to avoid stale values in this request.
+if (isset($_SESSION) && is_array($_SESSION)) {
+    $_SESSION = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

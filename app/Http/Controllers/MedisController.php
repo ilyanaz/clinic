@@ -8,6 +8,36 @@ use Illuminate\Support\Facades\File;
 class MedisController extends Controller
 {
     /**
+     * Mirror Laravel session values to legacy $_SESSION variables.
+     * Laravel remains the source of truth for authentication state.
+     */
+    private function syncLegacySessionBridge(): void
+    {
+        if (!isset($_SESSION) || !is_array($_SESSION)) {
+            $_SESSION = [];
+        }
+
+        if (session()->has('user_id')) {
+            $_SESSION['user_id'] = session('user_id');
+            $_SESSION['username'] = session('username');
+            $_SESSION['role'] = session('role');
+            $_SESSION['first_name'] = session('first_name');
+            $_SESSION['last_name'] = session('last_name');
+            $_SESSION['email'] = session('email');
+            return;
+        }
+
+        unset(
+            $_SESSION['user_id'],
+            $_SESSION['username'],
+            $_SESSION['role'],
+            $_SESSION['first_name'],
+            $_SESSION['last_name'],
+            $_SESSION['email']
+        );
+    }
+
+    /**
      * Serve PHP files from resources/medis/
      * Supports subdirectories: company/, patient/, medical/, generate/, report/, setting/
      */
@@ -105,6 +135,9 @@ class MedisController extends Controller
         ob_start();
         
         try {
+            // Keep legacy scripts working while Laravel session is canonical.
+            $this->syncLegacySessionBridge();
+
             // Make sure $clinic_pdo is available in global scope for included files
             if (isset($GLOBALS['clinic_pdo'])) {
                 $GLOBALS['clinic_pdo'] = $GLOBALS['clinic_pdo']; // Ensure it's set

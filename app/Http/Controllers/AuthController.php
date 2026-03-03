@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -79,13 +77,14 @@ class AuthController extends Controller
             }
             
             if ($passwordValid) {
-                // Store user data in session (matching original system)
+                // Laravel session is the single auth source of truth.
                 session([
                     'user_id' => $user->id,
                     'username' => $user->username,
                     'role' => $user->role,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
+                    'email' => $user->email,
                 ]);
 
                 return redirect()->route('dashboard');

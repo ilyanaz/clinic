@@ -1832,18 +1832,15 @@ function loginUser($username, $password) {
             }
             
             if ($password_match) {
-                // Start session if not already started
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-                
-                // Set session variables
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['first_name'] = $user['first_name'] ?? '';
-                $_SESSION['last_name'] = $user['last_name'] ?? '';
-                $_SESSION['email'] = $user['email'] ?? '';
+                // Laravel session is the canonical authentication state.
+                session([
+                    'user_id' => $user['id'],
+                    'username' => $user['username'],
+                    'role' => $user['role'],
+                    'first_name' => $user['first_name'] ?? '',
+                    'last_name' => $user['last_name'] ?? '',
+                    'email' => $user['email'] ?? '',
+                ]);
                 
                 return true;
             }
@@ -1857,7 +1854,7 @@ function loginUser($username, $password) {
 }
 
 function isLoggedIn() {
-    return isset($_SESSION['user_id']);
+    return session()->has('user_id');
 }
 
 function requireLogin() {
@@ -1869,7 +1866,7 @@ function requireLogin() {
 
 function requireRole($required_role) {
     requireLogin();
-    if ($_SESSION['role'] !== $required_role) {
+    if (session('role') !== $required_role) {
         header('Location: index.php');
         exit();
     }
@@ -1879,20 +1876,24 @@ function requireRole($required_role) {
 function getLoggedInUserMedicalStaffInfo() {
     global $clinic_pdo;
     
-    if (!isset($_SESSION['user_id'])) {
+    if (!session()->has('user_id')) {
         return null;
     }
     
     try {
+        $email = session('email');
+        $firstName = session('first_name');
+        $lastName = session('last_name');
+
         // First try to match by email
         $stmt = $clinic_pdo->prepare("SELECT * FROM medical_staff WHERE email = ?");
-        $stmt->execute([$_SESSION['email']]);
+        $stmt->execute([$email]);
         $staff = $stmt->fetch();
         
         // If no match by email, try to match by first_name and last_name
-        if (!$staff && isset($_SESSION['first_name']) && isset($_SESSION['last_name'])) {
+        if (!$staff && $firstName && $lastName) {
             $stmt = $clinic_pdo->prepare("SELECT * FROM medical_staff WHERE first_name = ? AND last_name = ?");
-            $stmt->execute([$_SESSION['first_name'], $_SESSION['last_name']]);
+            $stmt->execute([$firstName, $lastName]);
             $staff = $stmt->fetch();
         }
         
