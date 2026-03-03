@@ -270,7 +270,7 @@ if ($_POST) {
         <div class="login-card">
             <div class="login-header">
                 <div class="logo">
-                    <img src="medical_surveillance_logo.png" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <img src="<?php echo app_url('get_logo.php'); ?>" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <i class="fas fa-hospital" style="display: none; font-size: 2rem; color: white;"></i>
                 </div>
                 <h2>Medical Surveillance</h2>

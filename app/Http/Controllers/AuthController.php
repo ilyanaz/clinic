@@ -13,6 +13,10 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
+        if (session()->has('user_id')) {
+            return redirect()->route('dashboard');
+        }
+
         // Auto-create admin user if none exists
         try {
             $userCount = User::count();
@@ -77,6 +81,8 @@ class AuthController extends Controller
             }
             
             if ($passwordValid) {
+                $request->session()->regenerate();
+
                 // Laravel session is the single auth source of truth.
                 session([
                     'user_id' => $user->id,
@@ -87,7 +93,7 @@ class AuthController extends Controller
                     'email' => $user->email,
                 ]);
 
-                return redirect()->route('dashboard');
+                return redirect()->intended(route('dashboard'));
             }
         }
 
@@ -99,7 +105,8 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        session()->flush();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
         return redirect()->route('login');
     }
 }

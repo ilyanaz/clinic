@@ -11,7 +11,7 @@ if ($current_page == '') $current_page = 'index';
     <div class="container-fluid">
         <a class="navbar-brand" href="index.php">
             <div class="logo-small">
-                <img src="medical_surveillance_logo.png" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img src="{{ url('get_logo') }}" alt="Medical Surveillance Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <i class="fas fa-hospital" style="display: none; font-size: 1.2rem; color: white;"></i>
             </div>
             <div class="brand-text">

@@ -28,7 +28,8 @@ class AuthenticateMiddleware
                 return redirect()->route('install');
             }
             
-            return redirect()->route('login');
+            // Use guest redirect so Laravel stores the intended URL.
+            return redirect()->guest(route('login'));
         }
 
         return $next($request);

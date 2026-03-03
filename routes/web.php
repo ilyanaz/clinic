@@ -7,7 +7,7 @@ use App\Http\Controllers\MedisController;
 
 // Legacy PHP file routes - handle both GET and POST
 $legacyFiles = [
-    'index', 'patients', 'patient_list', 'patient_form', 
+    'patients', 'patient_list', 'patient_form', 
     'patient_view', 'patient_edit', 'company', 'company_form', 'medical', 
     'medical_list', 'medical_report', 'ms_report', 'employee_report', 
     'abnormal_workers_report', 'reports', 'usechh_1', 'usechh1_view',
@@ -55,5 +55,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth.session'])->group(function () {
+    Route::get('/index', [DashboardController::class, 'index']);
+    Route::get('/index.php', [DashboardController::class, 'index']);
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 });
