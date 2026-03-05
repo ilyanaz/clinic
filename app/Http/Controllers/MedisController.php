@@ -13,8 +13,9 @@ class MedisController extends Controller
      */
     private function syncLegacySessionBridge(): void
     {
-        if (!isset($_SESSION) || !is_array($_SESSION)) {
-            $_SESSION = [];
+        // Legacy pages call session_start(); ensure data is written to native session storage.
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
 
         if (session()->has('user_id')) {
@@ -24,9 +25,12 @@ class MedisController extends Controller
             $_SESSION['first_name'] = session('first_name');
             $_SESSION['last_name'] = session('last_name');
             $_SESSION['email'] = session('email');
+            session_write_close();
             return;
         }
 
+        // Keep native PHP session in sync with logout state.
+        $_SESSION = [];
         unset(
             $_SESSION['user_id'],
             $_SESSION['username'],
@@ -35,6 +39,7 @@ class MedisController extends Controller
             $_SESSION['last_name'],
             $_SESSION['email']
         );
+        session_write_close();
     }
 
     /**
