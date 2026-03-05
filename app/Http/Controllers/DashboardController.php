@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
@@ -39,27 +40,87 @@ class DashboardController extends Controller
     private function getDashboardStats($today)
     {
         try {
-            $totalPatients = DB::table('patient_information')->count();
-            $totalStaff = DB::table('medical_staff')->count();
-            $appointmentsToday = DB::table('appointments')
-                ->whereDate('appointment_date', $today)
-                ->count();
-            $surveillanceRecords = DB::table('surveillance_metadata')->count();
-            $pendingReviews = DB::table('surveillance_metadata')
-                ->whereNull('examination_date')
-                ->count();
-            $completedThisMonth = DB::table('appointments')
-                ->whereMonth('appointment_date', date('m'))
-                ->whereYear('appointment_date', date('Y'))
-                ->where('status', 'Completed')
-                ->count();
-            $totalAppointments = DB::table('appointments')->count();
-            $abnormalFindings = DB::table('conclusion_ms_finding')
-                ->where('fitness_status', '!=', 'Fit')
-                ->count();
-            $fitForWork = DB::table('conclusion_ms_finding')
-                ->where('fitness_status', 'Fit')
-                ->count();
+            $hasPatientInfo = Schema::hasTable('patient_information');
+            $hasMedicalStaff = Schema::hasTable('medical_staff');
+            $hasAppointments = Schema::hasTable('appointments');
+            $hasSurveillanceMetadata = Schema::hasTable('surveillance_metadata');
+            $hasChemicalInformation = Schema::hasTable('chemical_information');
+
+            $totalPatients = $hasPatientInfo ? DB::table('patient_information')->count() : 0;
+            $totalStaff = $hasMedicalStaff ? DB::table('medical_staff')->count() : 0;
+
+            // Prefer appointments table, fallback to chemical_information.
+            if ($hasAppointments) {
+                $appointmentsToday = DB::table('appointments')
+                    ->whereDate('appointment_date', $today)
+                    ->count();
+
+                $completedThisMonth = DB::table('appointments')
+                    ->whereMonth('appointment_date', date('m'))
+                    ->whereYear('appointment_date', date('Y'))
+                    ->where('status', 'Completed')
+                    ->count();
+
+                $totalAppointments = DB::table('appointments')->count();
+            } elseif ($hasChemicalInformation) {
+                $appointmentsToday = DB::table('chemical_information')
+                    ->whereDate('examination_date', $today)
+                    ->count();
+
+                $completedThisMonth = DB::table('chemical_information')
+                    ->whereMonth('examination_date', date('m'))
+                    ->whereYear('examination_date', date('Y'))
+                    ->where(function ($query) {
+                        $query->where('final_assessment', 'like', '%fit%')
+                            ->orWhere('final_assessment', 'like', '%normal%');
+                    })
+                    ->count();
+
+                $totalAppointments = DB::table('chemical_information')->count();
+            } else {
+                $appointmentsToday = 0;
+                $completedThisMonth = 0;
+                $totalAppointments = 0;
+            }
+
+            // Prefer surveillance_metadata if present, otherwise use chemical_information.
+            if ($hasSurveillanceMetadata) {
+                $surveillanceRecords = DB::table('surveillance_metadata')->count();
+                $pendingReviews = DB::table('surveillance_metadata')
+                    ->whereNull('examination_date')
+                    ->count();
+            } elseif ($hasChemicalInformation) {
+                $surveillanceRecords = DB::table('chemical_information')->count();
+                $pendingReviews = DB::table('chemical_information')
+                    ->where(function ($query) {
+                        $query->whereNull('final_assessment')
+                            ->orWhere('final_assessment', '');
+                    })
+                    ->count();
+            } else {
+                $surveillanceRecords = 0;
+                $pendingReviews = 0;
+            }
+
+            // Use final_assessment patterns, compatible with medical.sql schema.
+            if ($hasChemicalInformation) {
+                $abnormalFindings = DB::table('chemical_information')
+                    ->where(function ($query) {
+                        $query->where('final_assessment', 'like', '%abnormal%')
+                            ->orWhere('final_assessment', 'like', '%unfit%');
+                    })
+                    ->count();
+
+                $fitForWork = DB::table('chemical_information')
+                    ->where(function ($query) {
+                        $query->where('final_assessment', 'like', '%fit%')
+                            ->orWhere('final_assessment', 'like', '%normal%');
+                    })
+                    ->count();
+            } else {
+                $abnormalFindings = 0;
+                $fitForWork = 0;
+            }
 
             return [
                 'total_patients' => $totalPatients,

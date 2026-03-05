@@ -149,9 +149,29 @@ class MedisController extends Controller
             if (isset($GLOBALS['clinic_pdo'])) {
                 $GLOBALS['clinic_pdo'] = $GLOBALS['clinic_pdo']; // Ensure it's set
             }
-            
+
+            // Many legacy files call session_start() unconditionally.
+            // Suppress only the duplicate-session warning while loading them.
+            $previousErrorHandler = set_error_handler(function ($severity, $message) {
+                $isDuplicateSessionWarning = $severity === E_WARNING
+                    && is_string($message)
+                    && str_contains($message, 'session_start(): Ignoring session_start() because a session is already active');
+
+                if ($isDuplicateSessionWarning) {
+                    return true;
+                }
+
+                return false;
+            });
+
             // Include the medis PHP file
-            require $medisPath;
+            try {
+                require $medisPath;
+            } finally {
+                if ($previousErrorHandler !== null) {
+                    restore_error_handler();
+                }
+            }
             
             // Get the output
             $output = ob_get_clean();
