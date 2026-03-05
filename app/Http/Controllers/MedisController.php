@@ -25,7 +25,6 @@ class MedisController extends Controller
             $_SESSION['first_name'] = session('first_name');
             $_SESSION['last_name'] = session('last_name');
             $_SESSION['email'] = session('email');
-            session_write_close();
             return;
         }
 
@@ -39,7 +38,6 @@ class MedisController extends Controller
             $_SESSION['last_name'],
             $_SESSION['email']
         );
-        session_write_close();
     }
 
     /**
