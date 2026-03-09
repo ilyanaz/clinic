@@ -20,6 +20,11 @@
 !/public/uploads/.gitkeep
 /storage/*.key
 /storage/pail
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/testing/*
 /vendor
 Homestead.json
 Homestead.yaml
